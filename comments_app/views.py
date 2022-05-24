@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
-from django.http import HttpResponse
+# from django.http import HttpResponse
 from .models import Posts, Comments
 
 
@@ -17,7 +17,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserApi(APIView):
+class Login(APIView):
     def get(self, req):
         user = req.session.get('user', False)
         if user:
@@ -36,7 +36,7 @@ class UserApi(APIView):
 
 
 class TimeLineApi(APIView):
-    def get(self, request):
+    def get(self, req):
         posts = Posts.objects.all()
         post_serializer = PostSerializer(posts, many=True)
         comments = Comments.objects.all()
@@ -45,10 +45,10 @@ class TimeLineApi(APIView):
 
 
 class CommentsApi(APIView):
-    def post(self, request):
-        comment_text = request.data.get('comment_text')
-        root_post = request.data.get('root_post')
-        parent_comment = request.data.get('parent_comment')
+    def post(self, req):
+        comment_text = req.data.get('comment_text')
+        root_post = req.data.get('root_post')
+        parent_comment = req.data.get('parent_comment')
         if not all([comment_text, root_post, parent_comment]):
             return Response(status=400, data={"message": "Missing fields.",
                                               "fields": "[comment_text, root_post, parent_comment]"})
@@ -58,9 +58,9 @@ class CommentsApi(APIView):
 
 
 class PostApi(APIView):
-    def post(self, request):
-        user = request.session['user']
-        post_data = request.data.get('post_content')
+    def post(self, req):
+        user = req.session['user']
+        post_data = req.data.get('post_content')
         if not user:
             return Response(status=400,
                             data={"message": "To add a post, Please switch to a user at /app/user "})
